@@ -3,9 +3,12 @@ package br.com.unialfa.tableview.controller;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import br.com.unialfa.tableview.exception.DadosInvalidosException;
+import br.com.unialfa.tableview.exception.RegraDeNegocioException;
 import br.com.unialfa.tableview.model.entity.Paciente;
 import br.com.unialfa.tableview.model.enumerator.SexoEnum;
 import br.com.unialfa.tableview.model.enumerator.TipoAbordagemEnum;
+import br.com.unialfa.tableview.util.Utils;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -63,7 +66,7 @@ public class PacienteController implements Initializable {
 	@FXML
     private ToggleGroup tgrSexo;
 
-	private ObservableList<Paciente> pacientes = FXCollections.observableArrayList();
+	public static ObservableList<Paciente> pacientes = FXCollections.observableArrayList();
 
 	private Paciente pacienteSelected;
 
@@ -91,6 +94,12 @@ public class PacienteController implements Initializable {
 
 	@FXML
 	void salvar(ActionEvent event) {
+		try {
+			testaException();
+		} catch (DadosInvalidosException e) {
+			Utils.showMessageError(e.getMessage());
+		}
+		
 		Paciente p = new Paciente(Long.valueOf(txtID.getText()), txtNome.getText(), txtEmail.getText(),
 				cmbAbordagem.getSelectionModel().getSelectedItem());
 		RadioButton selectedRadioButton = returnSelectedRadioButton();
@@ -142,5 +151,11 @@ public class PacienteController implements Initializable {
 			return r;
 		}
 		return null;
+	}
+	
+	private void testaException() throws DadosInvalidosException {
+		if(txtID.getText().equals("") || txtID.getText() == null || txtID.getText().isEmpty()) {
+			throw new DadosInvalidosException("O campo não pode ser vazio ou nulo.");
+		}
 	}
 }
